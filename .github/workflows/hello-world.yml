@@ -27,6 +27,12 @@ jobs:
       
       - name: Check out code
         uses: actions/checkout@v3
+
+      - name: Access secret
+        env:
+          TEST_SECRET: ${{ secrets.TEST_SECRET }}
+        run: |
+          echo "Secret length: ${#TEST_SECRET}"
       
       - name: List files
         run: ls -la
