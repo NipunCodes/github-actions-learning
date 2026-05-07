@@ -50,6 +50,19 @@ jobs:
       - name: Build application
         working-directory: ./sample-app
         run: npm run build
+
+      - name: Create artifact
+        if: matrix.node-version == '18.x'
+        working-directory: ./sample-app
+        run: echo "Build output from Node ${{ matrix.node-version }}" > output.txt
+
+      - name: Upload artifact
+        if: matrix.node-version == '18.x'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: sample-app/output.txt
+          retention-days: 7
       
       - name: Run tests
         working-directory: ./sample-app
@@ -106,3 +119,20 @@ jobs:
           echo "🎯 Test Run Summary"
           echo "==================="
           echo "✅ All tests completed"
+
+  artifact-download:
+    name: Artifact Download
+    runs-on: ubuntu-latest
+    needs: [build-and-test]
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: ./artifact
+
+      - name: Verify build artifact
+        run: |
+          echo "Artifact contents:"
+          cat ./artifact/output.txt
